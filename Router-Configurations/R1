@@ -1,0 +1,79 @@
+version 12.1R1.9;
+system {
+    root-authentication {
+        encrypted-password "#######################"; ## SECRET-DATA
+    }
+    syslog {
+        user * {
+            any emergency;
+        }
+        file messages {
+            any notice;
+            authorization info;
+        }
+        file interactive-commands {
+            interactive-commands any;
+        }
+    }
+}
+interfaces {
+    em0 {
+        unit 0 {
+            family inet {
+                address 12.59.1.1/24;
+            }
+        }
+    }
+    em1 {
+        unit 0 {
+            family inet {
+                address 12.59.0.1/24;
+            }
+        }
+    }
+    em4 {
+        unit 0 {
+            family inet {
+                address 13.59.0.1/30;
+            }
+        }
+    }
+    lo0 {
+        unit 0 {
+            family inet {
+                address 1.1.1.1/32;
+            }
+        }
+    }
+}
+routing-options {
+    router-id 1.1.1.1;
+    autonomous-system 591;
+}
+protocols {
+    bgp {
+        group peer {
+            type external;
+            export TO_AS592;
+            neighbor 13.59.0.2 {
+                peer-as 592;
+            }
+        }
+    }
+}
+policy-options {
+    policy-statement TO_AS592 {
+        term 1 {
+            from {
+                route-filter 12.59.0.0/24 exact;
+            }
+            then accept;
+        }
+        term 2 {
+            from {
+                route-filter 12.59.1.0/24 exact;
+            }
+            then accept;
+        }
+    }
+}

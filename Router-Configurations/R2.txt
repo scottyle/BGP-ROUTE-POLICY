@@ -1,0 +1,121 @@
+Current configuration : 1602 bytes
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+!
+hostname R2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+no ip icmp rate-limit unreachable
+!
+!
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+no ipv6 cef
+!
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 2.2.2.2 255.255.255.255
+!
+interface FastEthernet0/0
+ ip address 14.59.0.1 255.255.255.0
+ duplex full
+!
+interface GigabitEthernet1/0
+ no ip address
+ shutdown
+ negotiation auto
+!
+interface GigabitEthernet2/0
+ ip address 13.59.0.5 255.255.255.252
+ negotiation auto
+!
+interface GigabitEthernet3/0
+ ip address 13.59.0.9 255.255.255.252
+ negotiation auto
+!
+interface GigabitEthernet4/0
+ ip address 13.59.0.2 255.255.255.252
+ negotiation auto
+!
+router bgp 592
+ bgp log-neighbor-changes
+ redistribute connected route-map subscriber
+ neighbor 13.59.0.1 remote-as 591
+ neighbor 13.59.0.1 route-map test1 in
+ neighbor 13.59.0.6 remote-as 593
+ neighbor 13.59.0.10 remote-as 594
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+ip access-list standard reject
+ permit 12.59.1.0 0.0.0.255
+!
+access-list 1 permit 14.59.0.0 0.0.0.255
+!
+route-map subscriber permit 10
+ match ip address 1
+!
+route-map test1 deny 10
+ match ip address reject
+!
+route-map test1 permit 20
+ match ip address permit
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+ stopbits 1
+line aux 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+ stopbits 1
+line vty 0 4
+ login
+!
+!
+end

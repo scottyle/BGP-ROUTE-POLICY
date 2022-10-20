@@ -1,0 +1,123 @@
+Current configuration : 1668 bytes
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+!
+hostname R4
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+no ip icmp rate-limit unreachable
+!
+!
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+no ipv6 cef
+!
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface FastEthernet0/0
+ ip address 17.59.0.129 255.255.255.128
+ duplex full
+!
+interface GigabitEthernet1/0
+ ip address 15.59.0.2 255.255.255.252
+ negotiation auto
+!
+interface GigabitEthernet2/0
+ ip address 17.59.0.1 255.255.255.128
+ negotiation auto
+!
+interface GigabitEthernet3/0
+ ip address 13.59.0.10 255.255.255.252
+ negotiation auto
+!
+interface GigabitEthernet4/0
+ no ip address
+ shutdown
+ negotiation auto
+!
+router bgp 594
+ bgp log-neighbor-changes
+ network 17.59.0.0 mask 255.255.255.128
+ network 17.59.0.128 mask 255.255.255.128
+ neighbor 13.59.0.9 remote-as 592
+ neighbor 13.59.0.9 route-map r3 out
+ neighbor 15.59.0.1 remote-as 593
+ neighbor 15.59.0.1 route-map blockr3 out
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+ip access-list standard rejectR2
+ permit 17.59.0.128 0.0.0.127
+ip access-list standard rejectR3
+ permit 17.59.0.0 0.0.0.127
+!
+!
+route-map blockr3 deny 10
+ match ip address rejectR2
+!
+route-map blockr3 permit 20
+ match ip address permit
+!
+route-map r3 deny 10
+ match ip address rejectR3
+!
+route-map r3 permit 20
+ match ip address permit
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+ stopbits 1
+line aux 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+ stopbits 1
+line vty 0 4
+ login
+!
+!
+end
